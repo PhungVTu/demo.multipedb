@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.core.CustomUserDetails;
 import com.example.demo.model.User;
 import com.example.demo.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(userName);
         }
-//        return new CustomUserDetails(user.toModel(), null);
-        return null;
+        return new CustomUserDetails(user.toModel(), null);
+//        return null;
 
     }
 }

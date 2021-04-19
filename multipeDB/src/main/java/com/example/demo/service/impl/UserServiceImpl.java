@@ -14,7 +14,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepository;
 
-    public User getListUser(String userName){
+    public User getUserByUserName(String userName){
         return userRepository.getUsersByUserName(userName);
     }
     public List<User> getListUsers(String password){

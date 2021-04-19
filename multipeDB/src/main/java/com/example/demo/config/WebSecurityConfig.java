@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import com.example.demo.base.JwtAuthenticationEntryPoint;
+import com.example.demo.base.JwtRequestFilter;
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +27,19 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     Environment environment;
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @Autowired
+    private UserDetailsService jwtUserDetailsService;
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
+
+    @Autowired
+    private CustomAuthenticationProvider customAuthProvider;
+
 
 
     @Autowired
@@ -34,14 +47,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //		// configure AuthenticationManager so that it knows from where to load
 //		// user for matching credentials
 //		// Use BCryptPasswordEncoder
-//		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());\
-//        customAuthProvider.setUserDetailService(jwtUserDetailsService);
-//        auth.authenticationProvider(customAuthProvider);
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+        customAuthProvider.setUserDetailService(jwtUserDetailsService);
+        auth.authenticationProvider(customAuthProvider);
     }
 
 
 
-    private static final String[] AUTH_WHITELIST = {"/**"};
+    private static final String[] AUTH_WHITELIST = {"/api/login","/api/test"};
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -52,11 +65,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated()
-                .and();
-//                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //         Add a filter to validate the tokens with every request
-//        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 
